@@ -21,7 +21,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800 pb-16">
+<body class="bg-slate-50 min-height-screen text-slate-800 pb-16">
 
     <!-- 상단 네비게이션 헤더 -->
     <header class="bg-emerald-600 text-white shadow-md py-4 px-6 no-print">
@@ -32,7 +32,7 @@
                 </span>
                 <div>
                     <h1 class="text-xl font-extrabold tracking-tight">초등 4학년 스마트 체육 팀 편성기</h1>
-                    <p class="text-xs text-emerald-100 font-semibold">능력치 항목 무제한 조절 및 우연 필터 탑재</p>
+                    <p class="text-xs text-emerald-100 font-semibold">자동 이전 데이터 복구 필터 가동 중</p>
                 </div>
             </div>
             <div class="flex flex-wrap items-center gap-2">
@@ -335,11 +335,47 @@
                     console.error("공유 데이터 복구 오류", e);
                 }
             } else {
-                // 2. 해시가 없을 경우 기존 로컬스토리지 보존 데이터 로드
+                // 2. 해시가 없을 경우 기존 로컬스토리지 보존 데이터 로드 및 이전버전 마이그레이션(중요)
                 const localStudents = localStorage.getItem('pe_roster_v5');
                 const localSchema = localStorage.getItem('pe_schema_v5');
                 const localRandom = localStorage.getItem('pe_random_filter_v5');
-                if (localStudents) students = JSON.parse(localStudents);
+                
+                // [이전버전 긴급 복구 알고리즘]
+                if (!localStudents) {
+                    // v2, v3, v4, 기본 데이터 키 순차 탐색
+                    const prevV4 = localStorage.getItem('pe_roster_data_v4');
+                    const prevV3 = localStorage.getItem('pe_roster_data_v3');
+                    const prevV2 = localStorage.getItem('pe_roster_data_v2');
+                    const prevDefault = localStorage.getItem('pe_roster_data');
+                    
+                    const recoveredRaw = prevV4 || prevV3 || prevV2 || prevDefault;
+                    if (recoveredRaw) {
+                        try {
+                            const recoveredList = JSON.parse(recoveredRaw);
+                            if (Array.isArray(recoveredList) && recoveredList.length > 0) {
+                                // v2 등 이전 버전은 stat1 등이 아닌 stamina, speed, ball 같은 고유 명칭으로 저장되었을 수 있으므로 이식
+                                students = recoveredList.map(s => {
+                                    return {
+                                        id: s.id || crypto.randomUUID(),
+                                        name: s.name,
+                                        gender: s.gender || '남',
+                                        stat1: s.stat1 !== undefined ? s.stat1 : (s.stamina !== undefined ? s.stamina : 3),
+                                        stat2: s.stat2 !== undefined ? s.stat2 : (s.speed !== undefined ? s.speed : 3),
+                                        stat3: s.stat3 !== undefined ? s.stat3 : (s.ball !== undefined ? s.ball : 3),
+                                        stat4: s.stat4 !== undefined ? s.stat4 : (s.cooperation !== undefined ? s.cooperation : 3),
+                                        stat5: s.stat5 !== undefined ? s.stat5 : (s.focus !== undefined ? s.focus : 3)
+                                    };
+                                });
+                                console.log("이전 버전 데이터 복구 성공:", students.length, "명");
+                            }
+                        } catch(err) {
+                            console.error("이전 명단 파싱 복구 실패", err);
+                        }
+                    }
+                } else {
+                    students = JSON.parse(localStudents);
+                }
+
                 if (localSchema) statSchema = JSON.parse(localSchema);
                 if (localRandom) document.getElementById('randomFilterSelect').value = localRandom;
             }
