@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>초등 4학년 체육 맞춤형 스마트 팀 편성기</title>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
+    <!-- FontAwesome Icons (CDN) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap');
@@ -16,12 +16,12 @@
         /* 프린트 스타일 */
         @media print {
             .no-print { display: none !important; }
-            body { background: white; color: black; }
-            .print-card { border: 1px solid #cbd5e1 !important; box-shadow: none !important; }
+            body { background: white; color: black; padding: 0; }
+            .print-card { border: 1px solid #cbd5e1 !important; box-shadow: none !important; break-inside: avoid; }
         }
     </style>
 </head>
-<body class="bg-slate-50 min-height-screen text-slate-800 pb-16">
+<body class="bg-slate-50 min-h-screen text-slate-800 pb-16">
 
     <!-- 상단 네비게이션 헤더 -->
     <header class="bg-emerald-600 text-white shadow-md py-4 px-6 no-print">
@@ -32,19 +32,34 @@
                 </span>
                 <div>
                     <h1 class="text-xl font-extrabold tracking-tight">초등 4학년 스마트 체육 팀 편성기</h1>
-                    <p class="text-xs text-emerald-100 font-semibold">교육과정 영역별 가중치 알고리즘 탑재</p>
+                    <p class="text-xs text-emerald-100 font-semibold">자동 데이터 저장 및 기기 간 링크 공유 탑재</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
-                <button onclick="loadSampleData()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs py-2 px-3 rounded-lg transition-all border border-emerald-500 shadow-sm">
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- 원격 전송/저장 특화 툴바 -->
+                <button onclick="generateShareUrl()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs py-2.5 px-3.5 rounded-lg transition-all shadow-sm flex items-center gap-1.5">
+                    <i class="fa-solid fa-share-nodes"></i> 태블릿으로 내보내기 (링크 생성)
+                </button>
+                <button onclick="loadSampleData()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs py-2.5 px-3.5 rounded-lg transition-all border border-emerald-500 shadow-sm">
                     <i class="fa-solid fa-users-line mr-1"></i> 샘플 학생(20명) 불러오기
                 </button>
-                <button onclick="resetAll()" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs py-2 px-3 rounded-lg transition-all shadow-sm">
+                <button onclick="resetAll()" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs py-2.5 px-3.5 rounded-lg transition-all shadow-sm">
                     <i class="fa-solid fa-trash-can mr-1"></i> 전체 초기화
                 </button>
             </div>
         </div>
     </header>
+
+    <!-- 링크 공유 알림 배너 -->
+    <div id="shareLoadedBanner" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 no-print">
+        <div class="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-xl flex justify-between items-center shadow-sm">
+            <div class="flex items-center gap-2 text-sm font-bold">
+                <i class="fa-solid fa-circle-check text-amber-600 text-lg"></i>
+                <span>외부 기기에서 가져온 학생 명단(<span id="shareStudentCount">0</span>명)이 동기화되었습니다! (원래 명단으로 되돌리려면 초기화를 눌러주세요)</span>
+            </div>
+            <button onclick="document.getElementById('shareLoadedBanner').classList.add('hidden')" class="text-amber-500 hover:text-amber-800 text-xs font-bold"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+    </div>
 
     <!-- 메인 콘텐츠 대시보드 -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -55,7 +70,7 @@
             <!-- 1. 종목 선택 및 팀 설정 카드 -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col gap-4">
                 <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <span class="text-emerald-500"><i class="fa-solid fa-person-running"></i></span>
+                    <span class="text-emerald-500"><i class="fa-solid fa-sliders"></i></span>
                     1. 체육 주제 & 가중치 세부 설정
                 </h2>
                 
@@ -71,17 +86,16 @@
                     </select>
                 </div>
 
-                <!-- 직접 입력 활동명 입력창 (평소엔 숨김) -->
+                <!-- 직접 입력 활동명 입력창 -->
                 <div id="customActivityNameContainer" class="hidden">
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">활동명 직접 입력</label>
-                    <input type="text" id="customActivityName" placeholder="예: 킨볼, 티볼, 피하기 넷볼 등" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <input type="text" id="customActivityName" placeholder="예: 킨볼, 티볼, 플로어볼 등" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                 </div>
 
-                <!-- 실시간 가중치 슬라이더 조절 판 -->
+                <!-- 가중치 슬라이더 조절 판 -->
                 <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col gap-3">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="text-xs font-extrabold text-slate-400 uppercase">종목별 능력치 가중치 반영 비율</span>
-                        <span class="text-[10px] font-bold text-slate-400">슬라이더로 조절 가능</span>
+                        <span class="text-xs font-extrabold text-slate-400 uppercase">종목 특성 가중치 설정 (슬라이더 조절)</span>
                     </div>
 
                     <!-- 체력 가중치 -->
@@ -133,15 +147,15 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-2">성별 분배 방식</label>
                         <select id="genderModeSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
-                            <option value="balance">남/여 균등 분배 (팀내 성비 균등)</option>
-                            <option value="separate">성별 분리 구성 (남자팀/여자팀 독립)</option>
-                            <option value="mix">성별 무관 구성 (전체 능력 밸런스)</option>
+                            <option value="balance">남/여 균등 분배 (팀내 성비 조화)</option>
+                            <option value="separate">성별 분리 구성 (남자팀 / 여자팀 분리)</option>
+                            <option value="mix">성별 무관 구성 (전체 능력치 밸런스)</option>
                         </select>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. 신규 학생 추가 카드 -->
+            <!-- 2. 학생 등록 카드 -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col gap-4">
                 <div class="flex justify-between items-center">
                     <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -154,7 +168,7 @@
                     </div>
                 </div>
 
-                <!-- 2-1. 개별 추가 폼 -->
+                <!-- 개별 추가 폼 -->
                 <form id="singleInputForm" onsubmit="addStudent(event)" class="flex flex-col gap-4">
                     <div class="grid grid-cols-12 gap-2">
                         <div class="col-span-7">
@@ -166,7 +180,6 @@
                         </div>
                     </div>
 
-                    <!-- 학생 신체 역량 원클릭 조절판 -->
                     <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 flex flex-col gap-3 text-sm">
                         <p class="text-xs font-extrabold text-slate-400 uppercase">능력 수준 설정 (1 ~ 5점)</p>
                         
@@ -212,13 +225,13 @@
                     </div>
 
                     <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-emerald-100 transition-all flex justify-center items-center gap-2">
-                        <i class="fa-solid fa-user-plus"></i> 명단에 이 학생 추가
+                        <i class="fa-solid fa-plus"></i> 명단에 이 학생 추가
                     </button>
                 </form>
 
-                <!-- 2-2. 대량 추가 폼 (Hidden by default) -->
+                <!-- 대량 추가 폼 (기본 비활성) -->
                 <div id="bulkInputForm" class="hidden flex flex-col gap-3">
-                    <p class="text-xs text-slate-500 leading-relaxed font-semibold">이름을 줄바꿈(엔터)으로 구분하여 붙여넣으세요. 능력 수준은 모두 <strong>'보통(3)'</strong>으로 자동 지정되며, 추후 리스트에서 개별 수정할 수 있습니다.</p>
+                    <p class="text-xs text-slate-500 leading-relaxed font-semibold">이름을 엔터(줄바꿈)로 구분하여 붙여넣으세요. 능력치는 모두 <strong>'보통(3)'</strong>으로 지정되며, 리스트에서 바로 변경할 수 있습니다.</p>
                     <textarea id="bulkNames" rows="5" placeholder="이영희&#10;김철수&#10;박민수" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
                     
                     <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl">
@@ -232,20 +245,19 @@
                 </div>
             </div>
 
-            <!-- 3. 현재 등록된 학생 리스트 (개별 편집 가능) -->
+            <!-- 3. 현재 등록된 학생 리스트 (로컬 세이브 연동) -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col gap-4">
                 <div class="flex justify-between items-center">
                     <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                        <span class="text-emerald-500"><i class="fa-solid fa-list-ul"></i></span>
+                        <span class="text-emerald-500"><i class="fa-solid fa-users"></i></span>
                         등록된 학생 명단 (<span id="totalCount">0</span>명)
                     </h2>
                 </div>
 
                 <div id="studentListContainer" class="max-h-[350px] overflow-y-auto divide-y divide-slate-100 pr-1">
-                    <!-- 학생 정보 행 실시간 로드 -->
                     <div class="text-center py-8 text-slate-400 font-semibold text-sm">
                         <i class="fa-solid fa-clipboard-user text-3xl mb-2 block text-slate-300"></i>
-                        아직 등록된 학생이 없습니다.<br>수동 추가 또는 샘플 학생을 불러와 주세요!
+                        등록된 학생이 없습니다.
                     </div>
                 </div>
             </div>
@@ -257,20 +269,19 @@
             <!-- 팀 빌더 실행 컨트롤러 (no-print) -->
             <div class="bg-slate-900 text-white rounded-2xl p-6 shadow-lg border border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4 no-print">
                 <div class="text-center sm:text-left">
-                    <h3 class="text-lg font-bold text-emerald-400">⚡ 밸런스 균형 알고리즘 준비 완료</h3>
-                    <p class="text-xs text-slate-400 mt-1">남여 비율과 종목 맞춤 능력치를 분석하여 완벽에 가까운 균형 팀을 짭니다.</p>
+                    <h3 class="text-lg font-bold text-emerald-400">⚡ 밸런스 균형 알고리즘 탑재</h3>
+                    <p class="text-xs text-slate-400 mt-1">학생들의 다각도 신체 지표를 분석하여 실력 균형을 자동으로 배분합니다.</p>
                 </div>
-                <button onclick="generateTeams()" class="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-extrabold py-3 px-8 rounded-xl shadow-lg shadow-emerald-950/40 transition-all flex items-center justify-center gap-2 text-base">
+                <button onclick="generateTeams()" class="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-extrabold py-3.5 px-8 rounded-xl shadow-lg shadow-emerald-950/40 transition-all flex items-center justify-center gap-2 text-base">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> 황금 밸런스 팀 편성하기
                 </button>
             </div>
 
             <!-- 결과 출력 카드 컨테이너 -->
             <div id="teamResultsContainer" class="flex flex-col gap-6">
-                <!-- 여기에 팀 편성 결과가 가로 카드 형태로 인쇄에 용이하게 생성됩니다. -->
                 <div class="bg-white rounded-3xl border-2 border-dashed border-slate-200 p-12 text-center text-slate-400 font-bold">
                     <i class="fa-solid fa-circle-nodes text-5xl mb-3 text-slate-300 block"></i>
-                    팀을 편성하면 이곳에 가중치 기반<br>전력 분석 차트와 각 팀의 명단이 멋지게 공개됩니다!
+                    팀을 편성하면 결과 분석 리포트와<br>팀 명단 카드가 이곳에 동적으로 나타납니다!
                 </div>
             </div>
 
@@ -280,7 +291,7 @@
                     <i class="fa-solid fa-print"></i> 칠판 부착용 종이 인쇄하기
                 </button>
                 <button onclick="copyTeamsToClipboard()" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold py-2.5 px-5 rounded-xl transition-all shadow-sm flex items-center gap-2">
-                    <i class="fa-solid fa-copy"></i> 편성 텍스트로 복사하기
+                    <i class="fa-solid fa-copy"></i> 편성 결과 텍스트 복사
                 </button>
             </div>
 
@@ -293,11 +304,10 @@
         // STATE MANAGEMENT (상태 관리)
         // -------------------------------------------------------------
         let students = [];
-        let inputMode = 'single'; // 'single' | 'bulk'
+        let inputMode = 'single';
         let currentGender = '남';
         let currentBulkGender = '남';
         
-        // 프리셋 가중치 정의
         const presets = {
             dodgeball:   { stamina: 10, speed: 30, ball: 50, cooperation: 10 },
             kickball:    { stamina: 20, speed: 20, ball: 40, cooperation: 20 },
@@ -314,27 +324,90 @@
         };
 
         // -------------------------------------------------------------
-        // INITIALIZATION
+        // INITIALIZATION & LOCALSTORAGE / HASH SYNC
         // -------------------------------------------------------------
         window.onload = function() {
             applyPresetWeights('dodgeball');
+            
+            // 1. URL 해시 데이터 체크 (외부 공유 진입 대응)
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#roster=')) {
+                try {
+                    const encodedData = hash.substring(8);
+                    const decodedData = decodeURIComponent(atob(encodedData));
+                    const imported = JSON.parse(decodedData);
+                    if (Array.isArray(imported) && imported.length > 0) {
+                        students = imported;
+                        saveToLocal(); // 가져온 데이터를 로컬에도 저장
+                        document.getElementById('shareLoadedBanner').classList.remove('hidden');
+                        document.getElementById('shareStudentCount').innerText = students.length;
+                    }
+                } catch (e) {
+                    console.error("공유 데이터 동기화 에러: ", e);
+                }
+            } else {
+                // 2. 해시가 없을 경우 기존 로컬스토리지 보존 데이터 로드
+                const local = localStorage.getItem('pe_roster_data');
+                if (local) {
+                    students = JSON.parse(local);
+                }
+            }
+            
             renderStudentList();
         };
 
-        function resetAll() {
-            students = [];
-            renderStudentList();
-            document.getElementById('teamResultsContainer').innerHTML = `
-                <div class="bg-white rounded-3xl border-2 border-dashed border-slate-200 p-12 text-center text-slate-400 font-bold">
-                    <i class="fa-solid fa-circle-nodes text-5xl mb-3 text-slate-300 block"></i>
-                    팀을 편성하면 이곳에 가중치 기반<br>전력 분석 차트와 각 팀의 명단이 멋지게 공개됩니다!
-                </div>`;
-            document.getElementById('printToolbar').classList.remove('flex');
-            document.getElementById('printToolbar').classList.add('hidden');
+        // 로컬 브라우저 세션 보존용 수동/자동 쓰기
+        function saveToLocal() {
+            localStorage.setItem('pe_roster_data', JSON.stringify(students));
         }
 
         // -------------------------------------------------------------
-        // GENDER & MODE TOGGLES
+        // SHARE URL GENERATOR (태블릿/모바일로 상태 복제하는 전송 설계)
+        // -------------------------------------------------------------
+        function generateShareUrl() {
+            if (students.length === 0) {
+                alert("내보낼 학생 명단이 비어 있습니다. 명단을 먼저 채워주세요.");
+                return;
+            }
+
+            try {
+                const serialized = JSON.stringify(students);
+                const b64Data = btoa(encodeURIComponent(serialized));
+                const shareUrl = window.location.origin + window.location.pathname + '#roster=' + b64Data;
+                
+                // 임시 필드를 통한 원터치 클립보드 복제 프로세스
+                const dummy = document.createElement("textarea");
+                document.body.appendChild(dummy);
+                dummy.value = shareUrl;
+                dummy.select();
+                document.execCommand("copy");
+                document.body.removeChild(dummy);
+
+                alert("명단이 압축 인코딩된 '전송용 링크'가 클립보드에 복사되었습니다!\n\n이 링크를 메신저나 문자로 전송하여 수업용 태블릿/휴대폰으로 열기만 하면 교실 기기와 완벽히 동일한 명단이 자동으로 로드됩니다.");
+            } catch (e) {
+                alert("링크 생성에 실패하였습니다. 수동 복사 기능 또는 로컬 저장소를 확인해 주세요.");
+            }
+        }
+
+        function resetAll() {
+            if (confirm("등록된 전체 학생 목록 및 설정 데이터를 완전히 삭제하시겠습니까?")) {
+                students = [];
+                localStorage.removeItem('pe_roster_data');
+                window.location.hash = '';
+                document.getElementById('shareLoadedBanner').classList.add('hidden');
+                renderStudentList();
+                document.getElementById('teamResultsContainer').innerHTML = `
+                    <div class="bg-white rounded-3xl border-2 border-dashed border-slate-200 p-12 text-center text-slate-400 font-bold">
+                        <i class="fa-solid fa-circle-nodes text-5xl mb-3 text-slate-300 block"></i>
+                        팀을 편성하면 결과 분석 리포트와<br>팀 명단 카드가 이곳에 동적으로 나타납니다!
+                    </div>`;
+                document.getElementById('printToolbar').classList.remove('flex');
+                document.getElementById('printToolbar').classList.add('hidden');
+            }
+        }
+
+        // -------------------------------------------------------------
+        // INPUT MODE & STATS ADJUSTMENTS
         // -------------------------------------------------------------
         function toggleInputMode(mode) {
             inputMode = mode;
@@ -382,9 +455,6 @@
             }
         }
 
-        // -------------------------------------------------------------
-        // STATS CONTROLS
-        // -------------------------------------------------------------
         function adjustStat(statName, direction) {
             let val = activeStats[statName];
             val += direction;
@@ -403,7 +473,7 @@
         }
 
         // -------------------------------------------------------------
-        // WEIGHT CONTROLS & NORMALIZATION (가중치 슬라이더 백분율 연산)
+        // WEIGHT MANAGEMENT
         // -------------------------------------------------------------
         function handleActivityChange() {
             const select = document.getElementById('activitySelect');
@@ -429,7 +499,6 @@
             }
         }
 
-        // 4개의 슬라이더 값을 기준으로 각 가중치의 정확한 상대적 %를 실시간 표기
         function calculateNormalizedWeights() {
             const wStamina = parseFloat(document.getElementById('weightStamina').value);
             const wSpeed = parseFloat(document.getElementById('weightSpeed').value);
@@ -438,7 +507,6 @@
 
             const sum = wStamina + wSpeed + wBall + wCooperation;
             
-            // 모든 값이 0일 경우 예외처리
             if (sum === 0) {
                 document.getElementById('weightStaminaLabel').innerText = '0%';
                 document.getElementById('weightSpeedLabel').innerText = '0%';
@@ -450,7 +518,7 @@
             const pStamina = Math.round((wStamina / sum) * 100);
             const pSpeed = Math.round((wSpeed / sum) * 100);
             const pBall = Math.round((wBall / sum) * 100);
-            const pCooperation = 100 - (pStamina + pSpeed + pBall); // 백분율 합이 100이 되도록 마감 보정
+            const pCooperation = 100 - (pStamina + pSpeed + pBall);
 
             document.getElementById('weightStaminaLabel').innerText = `${pStamina}%`;
             document.getElementById('weightSpeedLabel').innerText = `${pSpeed}%`;
@@ -466,7 +534,7 @@
         }
 
         // -------------------------------------------------------------
-        // STUDENT LIST MANIPULATION
+        // DATA MANIPULATION
         // -------------------------------------------------------------
         function addStudent(event) {
             event.preventDefault();
@@ -487,6 +555,7 @@
             students.push(newStudent);
             nameInput.value = '';
             renderStudentList();
+            saveToLocal();
         }
 
         function addBulkStudents() {
@@ -510,11 +579,13 @@
             textarea.value = '';
             toggleInputMode('single');
             renderStudentList();
+            saveToLocal();
         }
 
         function deleteStudent(id) {
             students = students.filter(s => s.id !== id);
             renderStudentList();
+            saveToLocal();
         }
 
         function adjustStudentStat(id, stat, delta) {
@@ -524,6 +595,7 @@
                 if (newVal >= 1 && newVal <= 5) {
                     student[stat] = newVal;
                     renderStudentList();
+                    saveToLocal();
                 }
             }
         }
@@ -533,11 +605,12 @@
             if (student) {
                 student.gender = student.gender === '남' ? '여' : '남';
                 renderStudentList();
+                saveToLocal();
             }
         }
 
         // -------------------------------------------------------------
-        // RENDER METHOD FOR REGISTRATION LIST
+        // RENDER METHOD FOR ROSTER LIST
         // -------------------------------------------------------------
         function renderStudentList() {
             const container = document.getElementById('studentListContainer');
@@ -561,30 +634,25 @@
                         <span class="font-bold text-slate-800">${student.name}</span>
                     </div>
                     
-                    <!-- 능력치 즉석 인디케이터 조절판 -->
                     <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-                        <!-- 체력 -->
                         <span class="flex items-center gap-1 font-semibold text-slate-500">
                             <span class="text-rose-400"><i class="fa-solid fa-heart"></i></span>
                             <button onclick="adjustStudentStat('${student.id}', 'stamina', -1)" class="w-4 h-4 rounded hover:bg-slate-100 flex items-center justify-center border font-bold">-</button>
                             <span class="font-bold text-slate-800">${student.stamina}</span>
                             <button onclick="adjustStudentStat('${student.id}', 'stamina', 1)" class="w-4 h-4 rounded hover:bg-slate-100 flex items-center justify-center border font-bold">+</button>
                         </span>
-                        <!-- 속도 -->
                         <span class="flex items-center gap-1 font-semibold text-slate-500">
                             <span class="text-amber-400"><i class="fa-solid fa-bolt"></i></span>
                             <button onclick="adjustStudentStat('${student.id}', 'speed', -1)" class="w-4 h-4 rounded hover:bg-slate-100 flex items-center justify-center border font-bold">-</button>
                             <span class="font-bold text-slate-800">${student.speed}</span>
                             <button onclick="adjustStudentStat('${student.id}', 'speed', 1)" class="w-4 h-4 rounded hover:bg-slate-100 flex items-center justify-center border font-bold">+</button>
                         </span>
-                        <!-- 구기기능 -->
                         <span class="flex items-center gap-1 font-semibold text-slate-500">
                             <span class="text-blue-400"><i class="fa-solid fa-baseball"></i></span>
                             <button onclick="adjustStudentStat('${student.id}', 'ball', -1)" class="w-4 h-4 rounded hover:bg-slate-100 flex items-center justify-center border font-bold">-</button>
                             <span class="font-bold text-slate-800">${student.ball}</span>
                             <button onclick="adjustStudentStat('${student.id}', 'ball', 1)" class="w-4 h-4 rounded hover:bg-slate-100 flex items-center justify-center border font-bold">+</button>
                         </span>
-                        <!-- 협동심 -->
                         <span class="flex items-center gap-1 font-semibold text-slate-500">
                             <span class="text-purple-400"><i class="fa-solid fa-people-group"></i></span>
                             <button onclick="adjustStudentStat('${student.id}', 'cooperation', -1)" class="w-4 h-4 rounded hover:bg-slate-100 flex items-center justify-center border font-bold">-</button>
@@ -592,7 +660,6 @@
                             <button onclick="adjustStudentStat('${student.id}', 'cooperation', 1)" class="w-4 h-4 rounded hover:bg-slate-100 flex items-center justify-center border font-bold">+</button>
                         </span>
                         
-                        <!-- 삭제 버튼 -->
                         <button onclick="deleteStudent('${student.id}')" class="text-rose-500 hover:text-rose-700 ml-2">
                             <i class="fa-solid fa-square-minus text-base"></i>
                         </button>
@@ -628,188 +695,148 @@
                 { id: "s20", name: "황다인", gender: "여", stamina: 3, speed: 4, ball: 3, cooperation: 5 }
             ];
             renderStudentList();
+            saveToLocal();
         }
 
         // -------------------------------------------------------------
-        // BALANCING TEAM ALGORITHM (황금 밸런스 분배 알고리즘)
+        // TEAM DISTRIBUTION ALGORITHM
         // -------------------------------------------------------------
-        let currentGeneratedTeams = []; // 복사용 보관용
+        let currentGeneratedTeams = [];
 
         function generateTeams() {
             if (students.length < 2) {
-                alert("팀을 짜기 위해서는 최소 2명 이상의 학생을 등록해 주세요.");
+                alert("팀을 편성하기 전 최소 2명 이상의 학생을 입력해 주세요.");
                 return;
             }
 
             const teamCount = parseInt(document.getElementById('teamCountInput').value);
             const genderMode = document.getElementById('genderModeSelect').value;
-            
-            // 실시간 슬라이더 세팅값 획득 및 정규화
             const normWeights = calculateNormalizedWeights();
 
-            // 1. 각 학생의 활동별 종합 전력 기여도 환산 (0 ~ 100점)
+            // 1. 학생 전력 평가
             const evaluatedStudents = students.map(s => {
                 const totalPower = (
                     s.stamina * normWeights.stamina + 
                     s.speed * normWeights.speed + 
                     s.ball * normWeights.ball + 
                     s.cooperation * normWeights.cooperation
-                ) * 20; // 5점 만점 기준을 100점 환산
-                
+                ) * 20;
                 return { ...s, calculatedPower: Math.round(totalPower * 10) / 10 };
             });
 
-            // 2. 팀 어레이 생성
             let teams = [];
-            const malesCount = evaluatedStudents.filter(s => s.gender === '남').length;
-            const femalesCount = evaluatedStudents.filter(s => s.gender === '여').length;
-            const totalCount = evaluatedStudents.length;
+            const mList = evaluatedStudents.filter(s => s.gender === '남');
+            const fList = evaluatedStudents.filter(s => s.gender === '여');
 
-            // 3. 성별 모드별 균등 분배 실행
-            if (genderMode === 'separate' && malesCount > 0 && femalesCount > 0) {
-                // [성별 분리 구성 모드] 
-                // 전체 성비를 비율적으로 계산해 남여 전용 팀 수 결정
-                let maleTeamsCount = Math.round(teamCount * (malesCount / totalCount));
-                // 한쪽에 팀이 하나도 몰리지 않도록 최소 1개는 강제 배정
-                maleTeamsCount = Math.max(1, Math.min(teamCount - 1, maleTeamsCount));
-                const femaleTeamsCount = teamCount - maleTeamsCount;
+            // 2. 성별 모드 연동 배분 실행
+            if (genderMode === 'separate' && mList.length > 0 && fList.length > 0) {
+                // 성별 분리 구성
+                let mTeamsCount = Math.round(teamCount * (mList.length / evaluatedStudents.length));
+                mTeamsCount = Math.max(1, Math.min(teamCount - 1, mTeamsCount));
+                const fTeamsCount = teamCount - mTeamsCount;
 
-                // 남자 전용 팀 리스트 초기화
-                for (let i = 0; i < maleTeamsCount; i++) {
-                    teams.push({
-                        id: i + 1,
-                        name: `남자 ${i + 1}팀`,
-                        genderType: '남',
-                        members: [],
-                        stats: { stamina: 0, speed: 0, ball: 0, cooperation: 0, power: 0, maleCount: 0, femaleCount: 0 }
-                    });
+                for (let i = 0; i < mTeamsCount; i++) {
+                    teams.push({ id: i + 1, name: `남자 ${i + 1}팀`, genderType: '남', members: [], stats: {} });
                 }
-                // 여자 전용 팀 리스트 초기화
-                for (let i = 0; i < femaleTeamsCount; i++) {
-                    teams.push({
-                        id: maleTeamsCount + i + 1,
-                        name: `여자 ${i + 1}팀`,
-                        genderType: '여',
-                        members: [],
-                        stats: { stamina: 0, speed: 0, ball: 0, cooperation: 0, power: 0, maleCount: 0, femaleCount: 0 }
-                    });
+                for (let i = 0; i < fTeamsCount; i++) {
+                    teams.push({ id: mTeamsCount + i + 1, name: `여자 ${i + 1}팀`, genderType: '여', members: [], stats: {} });
                 }
 
-                const males = evaluatedStudents.filter(s => s.gender === '남').sort((a, b) => b.calculatedPower - a.calculatedPower);
-                const females = evaluatedStudents.filter(s => s.gender === '여').sort((a, b) => b.calculatedPower - a.calculatedPower);
+                const sortedM = mList.sort((a, b) => b.calculatedPower - a.calculatedPower);
+                const sortedF = fList.sort((a, b) => b.calculatedPower - a.calculatedPower);
 
-                const maleTeams = teams.filter(t => t.genderType === '남');
-                const femaleTeams = teams.filter(t => t.genderType === '여');
-
-                distributeSnake(males, maleTeams);
-                distributeSnake(females, femaleTeams);
+                distributeSnake(sortedM, teams.filter(t => t.genderType === '남'));
+                distributeSnake(sortedF, teams.filter(t => t.genderType === '여'));
 
             } else {
-                // [기존 팀 통합 구성 모드]
+                // 성비 균등 또는 무작위 밸런스 혼합 구성
                 teams = Array.from({ length: teamCount }, (_, i) => ({
                     id: i + 1,
                     name: `${i + 1}팀`,
                     members: [],
-                    stats: { stamina: 0, speed: 0, ball: 0, cooperation: 0, power: 0, maleCount: 0, femaleCount: 0 }
+                    stats: {}
                 }));
 
                 if (genderMode === 'balance') {
-                    // 남녀 각각 지그재그(스네이크) 분배를 통한 팀 내 성비 균등
-                    const males = evaluatedStudents.filter(s => s.gender === '남').sort((a, b) => b.calculatedPower - a.calculatedPower);
-                    const females = evaluatedStudents.filter(s => s.gender === '여').sort((a, b) => b.calculatedPower - a.calculatedPower);
-
-                    distributeSnake(males, teams);
-                    distributeSnake(females, teams);
+                    const sortedM = mList.sort((a, b) => b.calculatedPower - a.calculatedPower);
+                    const sortedF = fList.sort((a, b) => b.calculatedPower - a.calculatedPower);
+                    distributeSnake(sortedM, teams);
+                    distributeSnake(sortedF, teams);
                 } else {
-                    // mix (성별 무관 전력 최우선)
                     const sortedAll = evaluatedStudents.sort((a, b) => b.calculatedPower - a.calculatedPower);
                     distributeSnake(sortedAll, teams);
                 }
             }
 
-            // 4. 각 팀의 통계 지표(평균) 계산
+            // 3. 통계 정량 평가 연산
             teams.forEach(team => {
                 if (team.members.length === 0) return;
-                
-                let sumStamina = 0, sumSpeed = 0, sumBall = 0, sumCooperation = 0, sumPower = 0;
-                let mCount = 0, fCount = 0;
+                let sStamina = 0, sSpeed = 0, sBall = 0, sCoop = 0, sPower = 0;
+                let mc = 0, fc = 0;
 
                 team.members.forEach(m => {
-                    sumStamina += m.stamina;
-                    sumSpeed += m.speed;
-                    sumBall += m.ball;
-                    sumCooperation += m.cooperation;
-                    sumPower += m.calculatedPower;
-                    if (m.gender === '남') mCount++;
-                    else fCount++;
+                    sStamina += m.stamina;
+                    sSpeed += m.speed;
+                    sBall += m.ball;
+                    sCoop += m.cooperation;
+                    sPower += m.calculatedPower;
+                    if (m.gender === '남') mc++; else fc++;
                 });
 
                 const len = team.members.length;
-                team.stats.stamina = Math.round((sumStamina / len) * 10) / 10;
-                team.stats.speed = Math.round((sumSpeed / len) * 10) / 10;
-                team.stats.ball = Math.round((sumBall / len) * 10) / 10;
-                team.stats.cooperation = Math.round((sumCooperation / len) * 10) / 10;
-                team.stats.power = Math.round((sumPower / len) * 10) / 10;
-                team.stats.maleCount = mCount;
-                team.stats.femaleCount = fCount;
+                team.stats = {
+                    stamina: Math.round((sStamina / len) * 10) / 10,
+                    speed: Math.round((sSpeed / len) * 10) / 10,
+                    ball: Math.round((sBall / len) * 10) / 10,
+                    cooperation: Math.round((sCoop / len) * 10) / 10,
+                    power: Math.round((sPower / len) * 10) / 10,
+                    maleCount: mc,
+                    femaleCount: fc
+                };
             });
 
             currentGeneratedTeams = teams;
             renderTeamResults(teams);
         }
 
-        // 지그재그(스네이크 드래프트) 분배 함수
-        function distributeSnake(studentList, teams) {
+        function distributeSnake(list, teams) {
             let ascending = true;
-            let teamIdx = 0;
+            let idx = 0;
             const n = teams.length;
 
-            studentList.forEach(student => {
-                teams[teamIdx].members.push(student);
-                
+            list.forEach(student => {
+                teams[idx].members.push(student);
                 if (ascending) {
-                    teamIdx++;
-                    if (teamIdx === n) {
-                        teamIdx = n - 1;
-                        ascending = false;
-                    }
+                    idx++;
+                    if (idx === n) { idx = n - 1; ascending = false; }
                 } else {
-                    teamIdx--;
-                    if (teamIdx === -1) {
-                        teamIdx = 0;
-                        ascending = true;
-                    }
+                    idx--;
+                    if (idx === -1) { idx = 0; ascending = true; }
                 }
             });
         }
 
         // -------------------------------------------------------------
-        // RENDER METHOD FOR BALANCED TEAMS RESULT
+        // RENDERING TEAMS INTERACTIVE SECTION
         // -------------------------------------------------------------
         function renderTeamResults(teams) {
             const container = document.getElementById('teamResultsContainer');
-            
-            // 전력 차트 지표 계산
-            let maxAveragePower = Math.max(...teams.map(t => t.stats.power));
-            let minAveragePower = Math.min(...teams.map(t => t.stats.power));
-            let variance = Math.round((maxAveragePower - minAveragePower) * 10) / 10;
+            let maxP = Math.max(...teams.map(t => t.stats.power || 0));
+            let minP = Math.min(...teams.map(t => t.stats.power || 0));
+            let variance = Math.round((maxP - minP) * 10) / 10;
 
             let html = `
-                <!-- 밸런스 브리핑 보드 (인쇄 비출력) -->
                 <div class="bg-emerald-950 text-white p-6 rounded-2xl border border-emerald-800 no-print">
                     <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
                         <div>
-                            <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">밸런스 정밀 분석</span>
+                            <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">밸런스 정밀 분석</span>
                             <h4 class="text-xl font-extrabold mt-1.5"><i class="fa-solid fa-chart-line mr-1.5"></i> 팀간 격차 변동률 : ${variance}점</h4>
                         </div>
                         <div class="text-xs text-emerald-200 font-semibold leading-relaxed">
-                            팀간 점수 격차가 <span class="text-yellow-400 font-bold">5점 이내</span>일 때 최적의 전력 균형을 가집니다.<br>
-                            체육 활동 도중 학생들의 상황에 맞춰 미세 정렬을 하실 수 있습니다.
+                            팀 간 격차가 <span class="text-yellow-400 font-bold">5점 이내</span>일 때 가장 공평한 배분이 실현됩니다.
                         </div>
                     </div>
                 </div>
-
-                <!-- 팀 명단 리스트 -->
                 <div class="grid grid-cols-1 md:grid-cols-${teams.length > 3 ? '2' : '1'} xl:grid-cols-${teams.length > 4 ? '3' : teams.length} gap-6">
             `;
 
@@ -822,16 +849,15 @@
                                     <span class="w-3.5 h-3.5 rounded-full bg-emerald-500"></span>
                                     ${team.name}
                                 </h3>
-                                <p class="text-[11px] font-bold text-slate-400 mt-0.5">인원수 : ${team.members.length}명 (${team.stats.maleCount}남 / ${team.stats.femaleCount}여)</p>
+                                <p class="text-[11px] font-bold text-slate-400 mt-0.5">인원: ${team.members.length}명 (${team.stats.maleCount}남 / ${team.stats.femaleCount}여)</p>
                             </div>
                             <div class="text-right">
                                 <span class="bg-emerald-50 text-emerald-700 border border-emerald-100 font-extrabold text-xs py-1 px-2.5 rounded-lg">
-                                    팀 전력: ${team.stats.power}점
+                                    평균 전력: ${team.stats.power}점
                                 </span>
                             </div>
                         </div>
 
-                        <!-- 해당 팀 학생 상세 목록 -->
                         <div class="flex flex-col gap-2">
                             ${team.members.map(m => `
                                 <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl text-sm hover:bg-slate-100 transition-all">
@@ -842,15 +868,13 @@
                                         <span class="font-bold text-slate-800">${m.name}</span>
                                     </div>
                                     <div class="flex items-center gap-3">
-                                        <!-- 활동 능력치 요약 -->
                                         <span class="text-[11px] text-slate-400 font-bold flex items-center gap-1.5">
                                             <span><i class="fa-solid fa-heart text-rose-400/70"></i> ${m.stamina}</span>
                                             <span><i class="fa-solid fa-bolt text-amber-400/70"></i> ${m.speed}</span>
                                             <span><i class="fa-solid fa-baseball text-blue-400/70"></i> ${m.ball}</span>
                                         </span>
-                                        <!-- 팀 이동 셀렉트 (no-print) -->
-                                        <select onchange="moveStudentToTeam('${m.id}', ${team.id}, this.value)" class="no-print bg-white border border-slate-200 text-slate-600 text-xs py-0.5 px-1.5 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer">
-                                            <option value="">팀 이동</option>
+                                        <select onchange="moveStudentToTeam('${m.id}', ${team.id}, this.value)" class="no-print bg-white border border-slate-200 text-slate-600 text-xs py-0.5 px-1.5 rounded focus:outline-none cursor-pointer">
+                                            <option value="">이동</option>
                                             ${teams.filter(t => t.id !== team.id).map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
                                         </select>
                                     </div>
@@ -858,7 +882,6 @@
                             `).join('')}
                         </div>
 
-                        <!-- 팀 전력 레이아웃 분석 바 -->
                         <div class="mt-6 border-t border-slate-100 pt-4 flex flex-col gap-2.5">
                             <div class="flex justify-between text-xs font-bold text-slate-400">
                                 <span>체력 평균</span>
@@ -867,21 +890,12 @@
                             <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                                 <div class="bg-rose-400 h-1.5 rounded-full" style="width: ${team.stats.stamina * 20}%"></div>
                             </div>
-
                             <div class="flex justify-between text-xs font-bold text-slate-400">
                                 <span>속도 평균</span>
                                 <span class="text-slate-700">${team.stats.speed}</span>
                             </div>
                             <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                                 <div class="bg-amber-400 h-1.5 rounded-full" style="width: ${team.stats.speed * 20}%"></div>
-                            </div>
-
-                            <div class="flex justify-between text-xs font-bold text-slate-400">
-                                <span>협동 평균</span>
-                                <span class="text-slate-700">${team.stats.cooperation}</span>
-                            </div>
-                            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                                <div class="bg-purple-400 h-1.5 rounded-full" style="width: ${team.stats.cooperation * 20}%"></div>
                             </div>
                         </div>
                     </div>
@@ -891,30 +905,26 @@
             html += `</div>`;
             container.innerHTML = html;
 
-            // 프린트 툴바 표시 활성화
             const toolbar = document.getElementById('printToolbar');
             toolbar.classList.remove('hidden');
             toolbar.classList.add('flex');
         }
 
         // -------------------------------------------------------------
-        // MANUAL INTERACTIVE SWAP (수동 팀 이동 기능)
+        // INTERACTIVE MANUAL TEAM SWAP
         // -------------------------------------------------------------
         function moveStudentToTeam(studentId, fromTeamId, toTeamIdStr) {
             if (!toTeamIdStr) return;
             const toTeamId = parseInt(toTeamIdStr);
 
-            // 해당 학생 탐색 및 기존 팀에서 제외
             const fromTeam = currentGeneratedTeams.find(t => t.id === fromTeamId);
             const studentIdx = fromTeam.members.findIndex(m => m.id === studentId);
             const student = fromTeam.members[studentIdx];
             fromTeam.members.splice(studentIdx, 1);
 
-            // 신규 팀에 가입
             const toTeam = currentGeneratedTeams.find(t => t.id === toTeamId);
             toTeam.members.push(student);
 
-            // 실시간 능력지 및 평균 점수 재계산
             const normWeights = calculateNormalizedWeights();
 
             [fromTeam, toTeam].forEach(team => {
@@ -923,69 +933,69 @@
                     return;
                 }
 
-                let sumStamina = 0, sumSpeed = 0, sumBall = 0, sumCooperation = 0, sumPower = 0;
-                let mCount = 0, fCount = 0;
+                let sStamina = 0, sSpeed = 0, sBall = 0, sCoop = 0, sPower = 0;
+                let mc = 0, fc = 0;
 
                 team.members.forEach(m => {
-                    sumStamina += m.stamina;
-                    sumSpeed += m.speed;
-                    sumBall += m.ball;
-                    sumCooperation += m.cooperation;
-                    sumPower += (
+                    sStamina += m.stamina;
+                    sSpeed += m.speed;
+                    sBall += m.ball;
+                    sCoop += m.cooperation;
+                    sPower += (
                         m.stamina * normWeights.stamina + 
                         m.speed * normWeights.speed + 
                         m.ball * normWeights.ball + 
                         m.cooperation * normWeights.cooperation
                     ) * 20;
 
-                    if (m.gender === '남') mCount++;
-                    else fCount++;
+                    if (m.gender === '남') mc++; else fc++;
                 });
 
                 const len = team.members.length;
-                team.stats.stamina = Math.round((sumStamina / len) * 10) / 10;
-                team.stats.speed = Math.round((sumSpeed / len) * 10) / 10;
-                team.stats.ball = Math.round((sumBall / len) * 10) / 10;
-                team.stats.cooperation = Math.round((sumCooperation / len) * 10) / 10;
-                team.stats.power = Math.round((sumPower / len) * 10) / 10;
-                team.stats.maleCount = mCount;
-                team.stats.femaleCount = fCount;
+                team.stats = {
+                    stamina: Math.round((sStamina / len) * 10) / 10,
+                    speed: Math.round((sSpeed / len) * 10) / 10,
+                    ball: Math.round((sBall / len) * 10) / 10,
+                    cooperation: Math.round((sCoop / len) * 10) / 10,
+                    power: Math.round((sPower / len) * 10) / 10,
+                    maleCount: mc,
+                    femaleCount: fc
+                };
             });
 
             renderTeamResults(currentGeneratedTeams);
         }
 
         // -------------------------------------------------------------
-        // CLIPBOARD EXPORT (복사 기능)
+        // CLIPBOARD EXPORT
         // -------------------------------------------------------------
         function copyTeamsToClipboard() {
             if (currentGeneratedTeams.length === 0) return;
 
             const select = document.getElementById('activitySelect');
-            let activityName = select.options[select.selectedIndex].text;
+            let actName = select.options[select.selectedIndex].text;
             if (select.value === 'custom') {
                 const customName = document.getElementById('customActivityName').value.trim();
-                activityName = customName ? `🏃 ${customName} (사용자 설정)` : "🏃 직접 입력한 체육활동";
+                actName = customName ? `🏃 ${customName} (사용자 설정)` : "체육활동";
             }
 
             let text = `📢 [체육 시간 팀 편성 결과]\n`;
-            text += `- 편성 종목: ${activityName}\n\n`;
+            text += `- 종목: ${actName}\n\n`;
 
             currentGeneratedTeams.forEach(team => {
-                text += `■ ${team.name} (전력: ${team.stats.power}점, 총 ${team.members.length}명)\n`;
+                text += `■ ${team.name} (${team.members.length}명)\n`;
                 text += `여학생: ${team.members.filter(m => m.gender === '여').map(m => m.name).join(', ')}\n`;
                 text += `남학생: ${team.members.filter(m => m.gender === '남').map(m => m.name).join(', ')}\n\n`;
             });
 
-            // 임시 textarea 생성으로 클립보드 복사 안전 지원 (가상 iFrame 대응)
-            const tempTextArea = document.createElement("textarea");
-            tempTextArea.value = text;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
+            const temp = document.createElement("textarea");
+            document.body.appendChild(temp);
+            temp.value = text;
+            temp.select();
             document.execCommand("copy");
-            document.body.removeChild(tempTextArea);
+            document.body.removeChild(temp);
 
-            alert("팀 편성 결과 텍스트가 복사되었습니다! 알림장이나 메신저에 바로 붙여넣으실 수 있습니다.");
+            alert("결과가 복사되었습니다!");
         }
     </script>
 </body>
