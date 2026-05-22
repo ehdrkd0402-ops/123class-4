@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>초등 4학년 체육 맞춤형 스마트 팀 편성기</title>
-    <!-- Tailwind CSS (CDN) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons (CDN) -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap');
@@ -102,36 +102,45 @@
                     <div class="flex flex-col gap-1">
                         <div class="flex justify-between text-xs font-bold">
                             <span class="text-rose-600"><i class="fa-solid fa-heart mr-1"></i> 체력</span>
-                            <span id="weightStaminaLabel" class="text-rose-500">25%</span>
+                            <span id="weightStaminaLabel" class="text-rose-500">20%</span>
                         </div>
-                        <input type="range" id="weightStamina" min="0" max="100" value="25" oninput="calculateNormalizedWeights()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-500">
+                        <input type="range" id="weightStamina" min="0" max="100" value="20" oninput="calculateNormalizedWeights()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-500">
                     </div>
 
                     <!-- 속도 가중치 -->
                     <div class="flex flex-col gap-1">
                         <div class="flex justify-between text-xs font-bold">
                             <span class="text-amber-600"><i class="fa-solid fa-bolt mr-1"></i> 속도</span>
-                            <span id="weightSpeedLabel" class="text-amber-500">25%</span>
+                            <span id="weightSpeedLabel" class="text-amber-500">20%</span>
                         </div>
-                        <input type="range" id="weightSpeed" min="0" max="100" value="25" oninput="calculateNormalizedWeights()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                        <input type="range" id="weightSpeed" min="0" max="100" value="20" oninput="calculateNormalizedWeights()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
                     </div>
 
                     <!-- 구기 가중치 -->
                     <div class="flex flex-col gap-1">
                         <div class="flex justify-between text-xs font-bold">
                             <span class="text-blue-600"><i class="fa-solid fa-baseball mr-1"></i> 구기기능</span>
-                            <span id="weightBallLabel" class="text-blue-500">25%</span>
+                            <span id="weightBallLabel" class="text-blue-500">20%</span>
                         </div>
-                        <input type="range" id="weightBall" min="0" max="100" value="25" oninput="calculateNormalizedWeights()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                        <input type="range" id="weightBall" min="0" max="100" value="20" oninput="calculateNormalizedWeights()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-500">
                     </div>
 
                     <!-- 협동 가중치 -->
                     <div class="flex flex-col gap-1">
                         <div class="flex justify-between text-xs font-bold">
                             <span class="text-purple-600"><i class="fa-solid fa-people-group mr-1"></i> 협동심</span>
-                            <span id="weightCooperationLabel" class="text-purple-500">25%</span>
+                            <span id="weightCooperationLabel" class="text-purple-500">20%</span>
                         </div>
-                        <input type="range" id="weightCooperation" min="0" max="100" value="25" oninput="calculateNormalizedWeights()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-purple-500">
+                        <input type="range" id="weightCooperation" min="0" max="100" value="20" oninput="calculateNormalizedWeights()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-purple-500">
+                    </div>
+
+                    <!-- 집중력 가중치 -->
+                    <div class="flex flex-col gap-1">
+                        <div class="flex justify-between text-xs font-bold">
+                            <span class="text-cyan-600"><i class="fa-solid fa-brain mr-1"></i> 집중력 (규칙 준수)</span>
+                            <span id="weightFocusLabel" class="text-cyan-500">20%</span>
+                        </div>
+                        <input type="range" id="weightFocus" min="0" max="100" value="20" oninput="calculateNormalizedWeights()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-cyan-500">
                     </div>
                 </div>
 
@@ -222,6 +231,16 @@
                                 <button type="button" onclick="adjustStat('Cooperation', 1)" class="w-7 h-7 bg-white border border-slate-200 hover:bg-slate-100 rounded-md font-bold">+</button>
                             </div>
                         </div>
+
+                        <!-- 집중력 -->
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-slate-600"><i class="fa-solid fa-brain text-cyan-400 mr-1.5"></i> 집중력 (Focus)</span>
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="adjustStat('Focus', -1)" class="w-7 h-7 bg-white border border-slate-200 hover:bg-slate-100 rounded-md font-bold">-</button>
+                                <span id="valFocus" class="w-6 text-center font-extrabold text-emerald-600">3</span>
+                                <button type="button" onclick="adjustStat('Focus', 1)" class="w-7 h-7 bg-white border border-slate-200 hover:bg-slate-100 rounded-md font-bold">+</button>
+                            </div>
+                        </div>
                     </div>
 
                     <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-emerald-100 transition-all flex justify-center items-center gap-2">
@@ -309,18 +328,19 @@
         let currentBulkGender = '남';
         
         const presets = {
-            dodgeball:   { stamina: 10, speed: 30, ball: 50, cooperation: 10 },
-            kickball:    { stamina: 20, speed: 20, ball: 40, cooperation: 20 },
-            relay:       { stamina: 40, speed: 50, ball: 0,  cooperation: 10 },
-            gymnastics:  { stamina: 30, speed: 0,  ball: 0,  cooperation: 70 },
-            general:     { stamina: 25, speed: 25, ball: 25, cooperation: 25 }
+            dodgeball:   { stamina: 10, speed: 20, ball: 40, cooperation: 10, focus: 20 },
+            kickball:    { stamina: 20, speed: 20, ball: 30, cooperation: 15, focus: 15 },
+            relay:       { stamina: 30, speed: 40, ball: 0,  cooperation: 10, focus: 20 },
+            gymnastics:  { stamina: 20, speed: 0,  ball: 0,  cooperation: 50, focus: 30 },
+            general:     { stamina: 20, speed: 20, ball: 20, cooperation: 20, focus: 20 }
         };
 
         const activeStats = {
             Stamina: 3,
             Speed: 3,
             Ball: 3,
-            Cooperation: 3
+            Cooperation: 3,
+            Focus: 3
         };
 
         // -------------------------------------------------------------
@@ -347,7 +367,7 @@
                 }
             } else {
                 // 2. 해시가 없을 경우 기존 로컬스토리지 보존 데이터 로드
-                const local = localStorage.getItem('pe_roster_data');
+                const local = localStorage.getItem('pe_roster_data_v2');
                 if (local) {
                     students = JSON.parse(local);
                 }
@@ -358,7 +378,7 @@
 
         // 로컬 브라우저 세션 보존용 수동/자동 쓰기
         function saveToLocal() {
-            localStorage.setItem('pe_roster_data', JSON.stringify(students));
+            localStorage.setItem('pe_roster_data_v2', JSON.stringify(students));
         }
 
         // -------------------------------------------------------------
@@ -392,7 +412,7 @@
         function resetAll() {
             if (confirm("등록된 전체 학생 목록 및 설정 데이터를 완전히 삭제하시겠습니까?")) {
                 students = [];
-                localStorage.removeItem('pe_roster_data');
+                localStorage.removeItem('pe_roster_data_v2');
                 window.location.hash = '';
                 document.getElementById('shareLoadedBanner').classList.add('hidden');
                 renderStudentList();
@@ -495,6 +515,7 @@
                 document.getElementById('weightSpeed').value = preset.speed;
                 document.getElementById('weightBall').value = preset.ball;
                 document.getElementById('weightCooperation').value = preset.cooperation;
+                document.getElementById('weightFocus').value = preset.focus;
                 calculateNormalizedWeights();
             }
         }
@@ -504,32 +525,37 @@
             const wSpeed = parseFloat(document.getElementById('weightSpeed').value);
             const wBall = parseFloat(document.getElementById('weightBall').value);
             const wCooperation = parseFloat(document.getElementById('weightCooperation').value);
+            const wFocus = parseFloat(document.getElementById('weightFocus').value);
 
-            const sum = wStamina + wSpeed + wBall + wCooperation;
+            const sum = wStamina + wSpeed + wBall + wCooperation + wFocus;
             
             if (sum === 0) {
                 document.getElementById('weightStaminaLabel').innerText = '0%';
                 document.getElementById('weightSpeedLabel').innerText = '0%';
                 document.getElementById('weightBallLabel').innerText = '0%';
                 document.getElementById('weightCooperationLabel').innerText = '0%';
-                return { stamina: 0, speed: 0, ball: 0, cooperation: 0 };
+                document.getElementById('weightFocusLabel').innerText = '0%';
+                return { stamina: 0, speed: 0, ball: 0, cooperation: 0, focus: 0 };
             }
 
             const pStamina = Math.round((wStamina / sum) * 100);
             const pSpeed = Math.round((wSpeed / sum) * 100);
             const pBall = Math.round((wBall / sum) * 100);
-            const pCooperation = 100 - (pStamina + pSpeed + pBall);
+            const pCooperation = Math.round((wCooperation / sum) * 100);
+            const pFocus = 100 - (pStamina + pSpeed + pBall + pCooperation);
 
             document.getElementById('weightStaminaLabel').innerText = `${pStamina}%`;
             document.getElementById('weightSpeedLabel').innerText = `${pSpeed}%`;
             document.getElementById('weightBallLabel').innerText = `${pBall}%`;
             document.getElementById('weightCooperationLabel').innerText = `${pCooperation}%`;
+            document.getElementById('weightFocusLabel').innerText = `${pFocus}%`;
 
             return {
                 stamina: wStamina / sum,
                 speed: wSpeed / sum,
                 ball: wBall / sum,
-                cooperation: wCooperation / sum
+                cooperation: wCooperation / sum,
+                focus: wFocus / sum
             };
         }
 
@@ -549,7 +575,8 @@
                 stamina: activeStats.Stamina,
                 speed: activeStats.Speed,
                 ball: activeStats.Ball,
-                cooperation: activeStats.Cooperation
+                cooperation: activeStats.Cooperation,
+                focus: activeStats.Focus
             };
 
             students.push(newStudent);
@@ -572,7 +599,8 @@
                     stamina: 3,
                     speed: 3,
                     ball: 3,
-                    cooperation: 3
+                    cooperation: 3,
+                    focus: 3
                 });
             });
 
@@ -659,6 +687,12 @@
                             <span class="font-bold text-slate-800">${student.cooperation}</span>
                             <button onclick="adjustStudentStat('${student.id}', 'cooperation', 1)" class="w-4 h-4 rounded hover:bg-slate-100 flex items-center justify-center border font-bold">+</button>
                         </span>
+                        <span class="flex items-center gap-1 font-semibold text-slate-500">
+                            <span class="text-cyan-400"><i class="fa-solid fa-brain"></i></span>
+                            <button onclick="adjustStudentStat('${student.id}', 'focus', -1)" class="w-4 h-4 rounded hover:bg-slate-100 flex items-center justify-center border font-bold">-</button>
+                            <span class="font-bold text-slate-800">${student.focus}</span>
+                            <button onclick="adjustStudentStat('${student.id}', 'focus', 1)" class="w-4 h-4 rounded hover:bg-slate-100 flex items-center justify-center border font-bold">+</button>
+                        </span>
                         
                         <button onclick="deleteStudent('${student.id}')" class="text-rose-500 hover:text-rose-700 ml-2">
                             <i class="fa-solid fa-square-minus text-base"></i>
@@ -669,37 +703,37 @@
         }
 
         // -------------------------------------------------------------
-        // PRELOAD SAMPLE DATA
+        // PRELOAD SAMPLE DATA (집중력 지표 업데이트 적용)
         // -------------------------------------------------------------
         function loadSampleData() {
             students = [
-                { id: "s1", name: "김민재", gender: "남", stamina: 5, speed: 4, ball: 5, cooperation: 3 },
-                { id: "s2", name: "이서연", gender: "여", stamina: 3, speed: 3, ball: 2, cooperation: 5 },
-                { id: "s3", name: "박지훈", gender: "남", stamina: 4, speed: 5, ball: 3, cooperation: 2 },
-                { id: "s4", name: "최하은", gender: "여", stamina: 2, speed: 4, ball: 4, cooperation: 4 },
-                { id: "s5", name: "정우진", gender: "남", stamina: 3, speed: 2, ball: 5, cooperation: 4 },
-                { id: "s6", name: "한지아", gender: "여", stamina: 4, speed: 3, ball: 3, cooperation: 5 },
-                { id: "s7", name: "강현우", gender: "남", stamina: 5, speed: 5, ball: 2, cooperation: 3 },
-                { id: "s8", name: "윤소희", gender: "여", stamina: 3, speed: 2, ball: 4, cooperation: 4 },
-                { id: "s9", name: "조예준", gender: "남", stamina: 2, speed: 3, ball: 3, cooperation: 5 },
-                { id: "s10", name: "장민서", gender: "여", stamina: 4, speed: 4, ball: 2, cooperation: 3 },
-                { id: "s11", name: "신동현", gender: "남", stamina: 3, speed: 4, ball: 4, cooperation: 2 },
-                { id: "s12", name: "임서현", gender: "여", stamina: 2, speed: 3, ball: 5, cooperation: 4 },
-                { id: "s13", name: "오건우", gender: "남", stamina: 4, speed: 3, ball: 4, cooperation: 4 },
-                { id: "s14", name: "서아윤", gender: "여", stamina: 5, speed: 2, ball: 3, cooperation: 5 },
-                { id: "s15", name: "송지성", gender: "남", stamina: 3, speed: 5, ball: 2, cooperation: 3 },
-                { id: "s16", name: "배유나", gender: "여", stamina: 4, speed: 4, ball: 4, cooperation: 4 },
-                { id: "s17", name: "권태웅", gender: "남", stamina: 5, speed: 4, ball: 3, cooperation: 5 },
-                { id: "s18", name: "손지민", gender: "여", stamina: 2, speed: 2, ball: 2, cooperation: 4 },
-                { id: "s19", name: "유시온", gender: "남", stamina: 4, speed: 3, ball: 5, cooperation: 3 },
-                { id: "s20", name: "황다인", gender: "여", stamina: 3, speed: 4, ball: 3, cooperation: 5 }
+                { id: "s1", name: "김민재", gender: "남", stamina: 5, speed: 4, ball: 5, cooperation: 3, focus: 4 },
+                { id: "s2", name: "이서연", gender: "여", stamina: 3, speed: 3, ball: 2, cooperation: 5, focus: 5 },
+                { id: "s3", name: "박지훈", gender: "남", stamina: 4, speed: 5, ball: 3, cooperation: 2, focus: 2 },
+                { id: "s4", name: "최하은", gender: "여", stamina: 2, speed: 4, ball: 4, cooperation: 4, focus: 4 },
+                { id: "s5", name: "정우진", gender: "남", stamina: 3, speed: 2, ball: 5, cooperation: 4, focus: 3 },
+                { id: "s6", name: "한지아", gender: "여", stamina: 4, speed: 3, ball: 3, cooperation: 5, focus: 5 },
+                { id: "s7", name: "강현우", gender: "남", stamina: 5, speed: 5, ball: 2, cooperation: 3, focus: 3 },
+                { id: "s8", name: "윤소희", gender: "여", stamina: 3, speed: 2, ball: 4, cooperation: 4, focus: 4 },
+                { id: "s9", name: "조예준", gender: "남", stamina: 2, speed: 3, ball: 3, cooperation: 5, focus: 4 },
+                { id: "s10", name: "장민서", gender: "여", stamina: 4, speed: 4, ball: 2, cooperation: 3, focus: 3 },
+                { id: "s11", name: "신동현", gender: "남", stamina: 3, speed: 4, ball: 4, cooperation: 2, focus: 1 },
+                { id: "s12", name: "임서현", gender: "여", stamina: 2, speed: 3, ball: 5, cooperation: 4, focus: 4 },
+                { id: "s13", name: "오건우", gender: "남", stamina: 4, speed: 3, ball: 4, cooperation: 4, focus: 3 },
+                { id: "s14", name: "서아윤", gender: "여", stamina: 5, speed: 2, ball: 3, cooperation: 5, focus: 5 },
+                { id: "s15", name: "송지성", gender: "남", stamina: 3, speed: 5, ball: 2, cooperation: 3, focus: 2 },
+                { id: "s16", name: "배유나", gender: "여", stamina: 4, speed: 4, ball: 4, cooperation: 4, focus: 4 },
+                { id: "s17", name: "권태웅", gender: "남", stamina: 5, speed: 4, ball: 3, cooperation: 5, focus: 4 },
+                { id: "s18", name: "손지민", gender: "여", stamina: 2, speed: 2, ball: 2, cooperation: 4, focus: 3 },
+                { id: "s19", name: "유시온", gender: "남", stamina: 4, speed: 3, ball: 5, cooperation: 3, focus: 4 },
+                { id: "s20", name: "황다인", gender: "여", stamina: 3, speed: 4, ball: 3, cooperation: 5, focus: 5 }
             ];
             renderStudentList();
             saveToLocal();
         }
 
         // -------------------------------------------------------------
-        // TEAM DISTRIBUTION ALGORITHM
+        // TEAM DISTRIBUTION ALGORITHM (정규화된 5개 가중치 연동 적용)
         // -------------------------------------------------------------
         let currentGeneratedTeams = [];
 
@@ -713,13 +747,14 @@
             const genderMode = document.getElementById('genderModeSelect').value;
             const normWeights = calculateNormalizedWeights();
 
-            // 1. 학생 전력 평가
+            // 1. 학생 전력 평가 (신규 집중력 가중치 연산 수식 결합)
             const evaluatedStudents = students.map(s => {
                 const totalPower = (
                     s.stamina * normWeights.stamina + 
                     s.speed * normWeights.speed + 
                     s.ball * normWeights.ball + 
-                    s.cooperation * normWeights.cooperation
+                    s.cooperation * normWeights.cooperation +
+                    (s.focus || 3) * normWeights.focus
                 ) * 20;
                 return { ...s, calculatedPower: Math.round(totalPower * 10) / 10 };
             });
@@ -730,7 +765,6 @@
 
             // 2. 성별 모드 연동 배분 실행
             if (genderMode === 'separate' && mList.length > 0 && fList.length > 0) {
-                // 성별 분리 구성
                 let mTeamsCount = Math.round(teamCount * (mList.length / evaluatedStudents.length));
                 mTeamsCount = Math.max(1, Math.min(teamCount - 1, mTeamsCount));
                 const fTeamsCount = teamCount - mTeamsCount;
@@ -749,7 +783,6 @@
                 distributeSnake(sortedF, teams.filter(t => t.genderType === '여'));
 
             } else {
-                // 성비 균등 또는 무작위 밸런스 혼합 구성
                 teams = Array.from({ length: teamCount }, (_, i) => ({
                     id: i + 1,
                     name: `${i + 1}팀`,
@@ -771,7 +804,7 @@
             // 3. 통계 정량 평가 연산
             teams.forEach(team => {
                 if (team.members.length === 0) return;
-                let sStamina = 0, sSpeed = 0, sBall = 0, sCoop = 0, sPower = 0;
+                let sStamina = 0, sSpeed = 0, sBall = 0, sCoop = 0, sFocus = 0, sPower = 0;
                 let mc = 0, fc = 0;
 
                 team.members.forEach(m => {
@@ -779,6 +812,7 @@
                     sSpeed += m.speed;
                     sBall += m.ball;
                     sCoop += m.cooperation;
+                    sFocus += (m.focus || 3);
                     sPower += m.calculatedPower;
                     if (m.gender === '남') mc++; else fc++;
                 });
@@ -789,6 +823,7 @@
                     speed: Math.round((sSpeed / len) * 10) / 10,
                     ball: Math.round((sBall / len) * 10) / 10,
                     cooperation: Math.round((sCoop / len) * 10) / 10,
+                    focus: Math.round((sFocus / len) * 10) / 10,
                     power: Math.round((sPower / len) * 10) / 10,
                     maleCount: mc,
                     femaleCount: fc
@@ -872,6 +907,7 @@
                                             <span><i class="fa-solid fa-heart text-rose-400/70"></i> ${m.stamina}</span>
                                             <span><i class="fa-solid fa-bolt text-amber-400/70"></i> ${m.speed}</span>
                                             <span><i class="fa-solid fa-baseball text-blue-400/70"></i> ${m.ball}</span>
+                                            <span><i class="fa-solid fa-brain text-cyan-400/70"></i> ${m.focus || 3}</span>
                                         </span>
                                         <select onchange="moveStudentToTeam('${m.id}', ${team.id}, this.value)" class="no-print bg-white border border-slate-200 text-slate-600 text-xs py-0.5 px-1.5 rounded focus:outline-none cursor-pointer">
                                             <option value="">이동</option>
@@ -896,6 +932,13 @@
                             </div>
                             <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                                 <div class="bg-amber-400 h-1.5 rounded-full" style="width: ${team.stats.speed * 20}%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs font-bold text-slate-400">
+                                <span>집중력 평균</span>
+                                <span class="text-slate-700">${team.stats.focus}</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                <div class="bg-cyan-400 h-1.5 rounded-full" style="width: ${team.stats.focus * 20}%"></div>
                             </div>
                         </div>
                     </div>
@@ -929,11 +972,11 @@
 
             [fromTeam, toTeam].forEach(team => {
                 if (team.members.length === 0) {
-                    team.stats = { stamina: 0, speed: 0, ball: 0, cooperation: 0, power: 0, maleCount: 0, femaleCount: 0 };
+                    team.stats = { stamina: 0, speed: 0, ball: 0, cooperation: 0, focus: 0, power: 0, maleCount: 0, femaleCount: 0 };
                     return;
                 }
 
-                let sStamina = 0, sSpeed = 0, sBall = 0, sCoop = 0, sPower = 0;
+                let sStamina = 0, sSpeed = 0, sBall = 0, sCoop = 0, sFocus = 0, sPower = 0;
                 let mc = 0, fc = 0;
 
                 team.members.forEach(m => {
@@ -941,11 +984,13 @@
                     sSpeed += m.speed;
                     sBall += m.ball;
                     sCoop += m.cooperation;
+                    sFocus += (m.focus || 3);
                     sPower += (
                         m.stamina * normWeights.stamina + 
                         m.speed * normWeights.speed + 
                         m.ball * normWeights.ball + 
-                        m.cooperation * normWeights.cooperation
+                        m.cooperation * normWeights.cooperation +
+                        (m.focus || 3) * normWeights.focus
                     ) * 20;
 
                     if (m.gender === '남') mc++; else fc++;
@@ -957,6 +1002,7 @@
                     speed: Math.round((sSpeed / len) * 10) / 10,
                     ball: Math.round((sBall / len) * 10) / 10,
                     cooperation: Math.round((sCoop / len) * 10) / 10,
+                    focus: Math.round((sFocus / len) * 10) / 10,
                     power: Math.round((sPower / len) * 10) / 10,
                     maleCount: mc,
                     femaleCount: fc
